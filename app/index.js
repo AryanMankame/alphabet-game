@@ -1,71 +1,70 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View , Text, Touchable, Image } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-// import Sound from 'react-native-sound';
+import { Audio } from 'expo-av'
 export default function Home() {
   const lettersGrid = [['A','B','C'],['D','E','F'],['G','H']]
   const showGif = {
     "A" : {
         name : "Apple",
-        src: "./assets/apple.gif",
-        voice: "a.mp3"
+        src: require('../assets/apple.gif'),
+        voice: require('../assets/a.mp3')
     },
     "B" : {
         name : "Bear",
-        src: "./assets/Bear.gif",
-        voice: "b.mp3"
+        src: require("../assets/bear.gif"),
+        voice: require('../assets/b.mp3')
     },
     "C" : {
         name : "Coin",
-        src: "./assets/coin.gif",
-        voice: "c.mp3"
+        src: require("../assets/coin.gif"),
+        voice: require('../assets/c.mp3')
     },
     "D" : {
         name : "Duck",
-        src: "./assets/duck.gif",
-        voice: "d.mp3"
+        src: require("../assets/duck.gif"),
+        voice: require('../assets/d.mp3')
     },
     "E" : {
         name : "Eye",
-        src: "./assets/eye.gif",
-        voice: "e.mp3"
+        src: require("../assets/eye.gif"),
+        voice: require("../assets/e.mp3")
     },
     "F" : {
         name : "Food Truck",
-        src: "./assets/food-truck.gif",
-        voice: "f.mp3"
+        src: require("../assets/food-truck.gif"),
+        voice: require("../assets/f.mp3")
     },
     "G" : {
         name : "Gift",
-        src: "./assets/gift.gif",
-        voice: "g.mp3"
+        src: require("../assets/gift.gif"),
+        voice: require("../assets/g.mp3")
 
     },
     "H" : {
         name : "Horse",
-        src: "./assets/horse.gif",
-        voice: "h.mp3"
+        src: require("../assets/horse.gif"),
+        voice: require("../assets/h.mp3")
     },
   }
-//   const playSound = (path) => {
-//     var whoosh = new Sound(path, Sound.MAIN_BUNDLE, (error) => {
-//         if (error) {
-//           console.log('failed to load the sound', error);
-//           return;
-//         }
-//         // loaded successfully
-//         console.log('duration in seconds: ' + whoosh.getDuration() + 'number of channels: ' + whoosh.getNumberOfChannels());
-      
-//         // Play the sound with an onEnd callback
-//         whoosh.play((success) => {
-//           if (success) {
-//             console.log('successfully finished playing');
-//           } else {
-//             console.log('playback failed due to audio decoding errors');
-//           }
-//         });
-//       });
-//   }
+  const [sound, setSound] = useState();
+  useEffect(() => {
+    return sound
+      ? () => {
+          console.log('Unloading Sound');
+          sound.unloadAsync();
+        }
+      : undefined;
+  }, [sound]);
+  async function playSound(path) {
+    console.log('Loading Sound');
+    const { sound } = await Audio.Sound.createAsync( path
+    );
+    setSound(sound);
+
+    console.log('Playing Sound');
+    await sound.playAsync();
+  }
   const [pressedBtn,setPressedBtn] = useState(null);
   return (
     <View style={{
@@ -76,7 +75,7 @@ export default function Home() {
         alignItems: 'center',
     }}>
         <View style={{
-            height: '58vh',
+            height: '58%',
             width: '90%',
             backgroundColor: '#FCE7D2',
             borderRadius: 10,
@@ -86,20 +85,22 @@ export default function Home() {
             { pressedBtn ? 
             <View>
                 <Image style={{
-                height: '250px', width: '250px'
-            }}source={showGif[pressedBtn].src} />
+                height: 250, width: 250
+                }}
+                source={showGif[pressedBtn].src} />
             <Text style={{
-                textAlign: 'center', fontSize: '24px', fontWeight: 'bold' , fontFamily: 'Comic Sans MS',
+                textAlign: 'center', fontSize: 24, fontWeight: 'bold',
+                // fontFamily: 'Comic Sans MS'
             }}>{showGif[pressedBtn].name}</Text>
             </View> : <Text>Press a Button!!</Text> }
         </View>
         <View style = {{
-            height: '40vh',
+            height: '40%',
             backgroundColor: 'white',
             flexDirection: 'column',
             width: '100vw',
             justifyContent: 'center',
-            gap: '20px'
+            gap: 10
         }}>
             {
                 lettersGrid.map(letters => 
@@ -108,41 +109,46 @@ export default function Home() {
                             flexDirection: 'row',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            gap: '20px'
+                            gap: 10,
                         }}>
                         {
                             letters.map(letter => (
                                 <TouchableOpacity key = {letter} style={{
-                                    position: 'relative',
+                                    height: 90,
+                                    width: 90,
                                 }} onPress={() => {
                                     setPressedBtn(letter)
-                                    // playSound(showGif[letter].voice)
+                                    console.log("src => ",showGif[letter].src)
+                                    playSound(showGif[letter].voice)
                                 }}>
                                     <View style={{
-                                        height: '90px',
-                                        width: '90px',
+                                        height: 90,
+                                        width: 90,
+                                        position: 'relative',
+                                        backgroundColor: 'red',
+                                        zIndex: 1,
+                                        top: 2.5,
+                                        left:6.5,
+                                        borderRadius: 10
+                                    }}></View>
+                                    <View style={{
+                                        height: 90,
+                                        width: 90,
                                         backgroundColor: 'orange',
                                         zIndex: 2,
-                                        // position: 'absolute',
+                                        position: 'relative',
+                                        bottom : 96,
+                                        right: 5.5,
                                     }}>
                                         <Text style={{
                                             height: '100%',
-                                            marginTop: '30px',
+                                            marginTop: 30,
                                             textAlign: 'center',
-                                            fontSize: '20px',
+                                            fontSize: 20,
                                             fontWeight: 'bold',
-                                            fontFamily: 'Comic Sans MS',
+                                            // fontFamily: 'Comic Sans MS3',
                                         }}>{letter}</Text>
                                     </View>
-                                    <View style={{
-                                        height: '90px',
-                                        width: '90px',
-                                        position: 'absolute',
-                                        backgroundColor: 'red',
-                                        zIndex: 1,
-                                        left: '6.5px',
-                                        top: '6.5px'
-                                    }}></View>
                                 </TouchableOpacity>
                             ))
                         }
